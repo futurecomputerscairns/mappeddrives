@@ -9,7 +9,6 @@ function CreateITGItem ($resource, $body) {
 }
 
 $assettypeID = 120571
-$key = "$varITGKey"
 $ITGbaseURI = "https://api.itglue.com"
 
  
