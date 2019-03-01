@@ -1,8 +1,21 @@
 ﻿Param (
-       [string]$organisation = ""
+       [string]$organisation = "",
+       [string]$key = ""
        )
 
+function CreateITGItem ($resource, $body) {
+    $item = Invoke-RestMethod -Method POST -ContentType application/vnd.api+json -Uri $ITGbaseURI/$resource -Body $body -Headers $headers
+    return $item
+}
+
 $assettypeID = 120571
+$key = "$varITGKey"
+$ITGbaseURI = "https://api.itglue.com"
+
+ 
+$headers = @{
+    "x-api-key" = $key
+}
 
 Write-Host Attempting match of ITGlue Company using name $organisation -ForegroundColor Green
 
@@ -65,7 +78,8 @@ throw "Module GroupPolicy not Installed"
         
  foreach ($obj in $drivearray){
     
-    $body = @{"data" = @{
+    $body = @{
+        data = @{
             type       = "flexible-assets"
             attributes = @{
                 "organization_id"           = $ITGlueOrganisation
@@ -84,7 +98,7 @@ throw "Module GroupPolicy not Installed"
     $tenantAsset = $body | ConvertTo-Json -Depth 10
 
 
-New-ITGlueFlexibleAssetFields -Data $TenantAsset
+CreateITGItem -resource flexible_assets -body $tenantAsset
 Write-Host "Created Mapped Drive Object for $($obj.DriveLabel)"
 }
 
