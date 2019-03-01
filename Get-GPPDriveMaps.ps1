@@ -1,16 +1,8 @@
 ﻿Param (
-       [string]$organisation = "",
-       [string]$key = ""
+       [string]$organisation = ""
        )
-#
-# Variables
-#
 
-Import-Module ITGlueApi
-
-Add-ITGlueAPIKey -Api_Key $key
 $assettypeID = 120571
-
 
 Write-Host Attempting match of ITGlue Company using name $organisation -ForegroundColor Green
 
