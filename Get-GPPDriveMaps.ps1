@@ -1,6 +1,5 @@
 ﻿Param (
-       [string]$organisation = "",
-       [string]$key = ""
+       [string]$organisation = ""
        )
 
 function CreateITGItem ($resource, $body) {
