@@ -1,5 +1,6 @@
 ﻿Param (
-       [string]$organisation = ""
+       [string]$organisation = "",
+       [string]$key = ""
        )
 
 function CreateITGItem ($resource, $body) {
@@ -9,6 +10,7 @@ function CreateITGItem ($resource, $body) {
 
 $assettypeID = 120571
 $ITGbaseURI = "https://api.itglue.com"
+Add-ITGlueAPIKey -Api_Key $key
 
  
 $headers = @{
