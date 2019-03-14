@@ -3,14 +3,20 @@
        [string]$key = ""
        )
 
+$assettypeID = 120571
+$ITGbaseURI = "https://api.itglue.com"
+
+Import-Module C:\temp\itglue\modules\itgluepowershell\ITGlueAPI.psd1 -Force
+Add-ITGlueAPIKey -Api_Key $key
+Add-ITGlueBaseURI -base_uri $ITGbaseURI
+
 function CreateITGItem ($resource, $body) {
     $item = Invoke-RestMethod -Method POST -ContentType application/vnd.api+json -Uri $ITGbaseURI/$resource -Body $body -Headers $headers
     return $item
 }
 
-$assettypeID = 120571
-$ITGbaseURI = "https://api.itglue.com"
-Add-ITGlueAPIKey -Api_Key $key
+
+
 
  
 $headers = @{
