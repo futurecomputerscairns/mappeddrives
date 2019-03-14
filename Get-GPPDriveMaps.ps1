@@ -31,10 +31,14 @@ if($attempted_match.data[0].attributes.name -eq $organisation) {
 
 #Remove existing Flexible assets
 
-$existing = Get-ITGlueFlexibleAssets -filter_flexible_asset_type_id 120571 -filter_organization_id $ITGlueOrganisation
+$existing = Get-ITGlueFlexibleAssets -filter_flexible_asset_type_id $assettypeID -filter_organization_id $ITGlueOrganisation
 if ($existing -ne $null){
-Write-Host Removing existing mapped drives...
-$existing.data.id | % {Remove-ITGlueFlexibleAssets -id $_ -Confirm:$false}
+$existing.data | % {
+
+Write-Host Removing existing mapped drives from ITGlue
+
+Remove-ITGlueFlexibleAssets -id $_.id -Confirm:$false}
+
 }
 #Import the required module GroupPolicy
 $drivearray = @()
