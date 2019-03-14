@@ -35,7 +35,7 @@ $existing = Get-ITGlueFlexibleAssets -filter_flexible_asset_type_id 120571 -filt
 if ($existing -ne $null){
 Write-Host Removing existing mapped drives...
 $existing.data.id | % {Remove-ITGlueFlexibleAssets -id $_ -Confirm:$false}
-
+}
 #Import the required module GroupPolicy
 $drivearray = @()
 try
