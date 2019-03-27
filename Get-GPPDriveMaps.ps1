@@ -10,12 +10,56 @@ Import-Module C:\temp\itglue\modules\itgluepowershell\ITGlueAPI.psd1 -Force
 Add-ITGlueAPIKey -Api_Key $key
 Add-ITGlueBaseURI -base_uri $ITGbaseURI
 
+function GetAllITGItems ($Resource) {
+    $array = @()
+    
+    $body = Invoke-RestMethod -Method get -Uri "$ITGbaseURI/$Resource" -Headers $headers -ContentType application/vnd.api+json
+    $array += $body.data
+    Write-Host "Retrieved $($array.Count) items"
+        
+    if ($body.links.next) {
+        do {
+            $body = Invoke-RestMethod -Method get -Uri $body.links.next -Headers $headers -ContentType application/vnd.api+json
+            $array += $body.data
+            Write-Host "Retrieved $($array.Count) items"
+        } while ($body.links.next)
+    }
+    return $array
+}
+
 function CreateITGItem ($resource, $body) {
     $item = Invoke-RestMethod -Method POST -ContentType application/vnd.api+json -Uri $ITGbaseURI/$resource -Body $body -Headers $headers
     return $item
 }
 
+function UpdateITGItem ($resource, $existingItem, $newBody) {
+    $updatedItem = Invoke-RestMethod -Method Patch -Uri "$ITGbaseUri/$Resource/$($existingItem.id)" -Headers $headers -ContentType application/vnd.api+json -Body $newBody
+    return $updatedItem
+}
 
+function CreateMappedDriveAsset ($tenantInfo) {
+
+$body = @{
+        data = @{
+            type       = "flexible-assets"
+            attributes = @{
+                "organization_id"           = $ITGlueOrganisation
+                "flexible_asset_type_id"    = $assettypeID
+                traits                      = @{
+                    "drive-letter"          = $obj.DriveLetter
+                    "drive-label"           = $obj.DriveLabel
+                    "drive-path"            = $obj.DrivePath
+                    "item-level-targetting" = $obj.DriveFilterGroup
+
+                }
+            }
+        }
+ }
+
+
+ $tenantAsset = $body | ConvertTo-Json -Depth 10
+ 
+}
 
 
  
@@ -37,17 +81,7 @@ if($attempted_match.data[0].attributes.name -eq $organisation) {
             Exit
             }
 
-#Remove existing Flexible assets
 
-$existing = Get-ITGlueFlexibleAssets -filter_flexible_asset_type_id $assettypeID -filter_organization_id $ITGlueOrganisation
-if ($existing -ne $null){
-$existing.data | % {
-
-Write-Host Removing existing mapped drives from ITGlue
-
-Remove-ITGlueFlexibleAssets -id $_.id -Confirm:$false}
-
-}
 #Import the required module GroupPolicy
 $drivearray = @()
 try
@@ -89,33 +123,35 @@ throw "Module GroupPolicy not Installed"
                                     $object | Add-Member -MemberType NoteProperty -Name DrivePersistent -Value $DrivePersistent
                                     $object | Add-Member -MemberType NoteProperty -Name DriveFilterGroup -Value $DriveFilterGroup
                                     $drivearray += $Object
-                                }
+
+                                    foreach ($obj in $drivearray){
+ 
+                                    $existingAssets = @()
+                                    $existingAssets += GetAllITGItems -Resource "flexible_assets?filter[organization_id]=$ITGlueOrganisation&filter[flexible_asset_type_id]=$assetTypeID"
+                                    $matchingAsset = $existingAssets | Where-Object {$_.attributes.traits.'drive-label' -contains $obj.DriveLabel}
+
+                                        if ($matchingAsset) {
+                                            Write-Output "Updating Mapped Drive Flexible Asset for $obj.DriveLabel"
+                                            $UpdatedBody = CreateMappedDriveAsset -tenantInfo $obj
+                                            $updatedItem = UpdateITGItem -resource flexible_assets -existingItem $matchingAsset -newBody $UpdatedBody
+                                            Start-Sleep -Seconds 3
+                                            }
+                                            else {
+                                                Write-Output "Creating Mapped Drive Flexible Asset for $obj.DriveLabel"
+                                                $body = CreateMappedDriveAsset -tenantInfo $obj
+                                                CreateITGItem -resource flexible_assets -body $body
+                                                Start-Sleep -Seconds 3
+        
+                                            }
+
+
+                                        }
+
+
+
+                                  }
                             }
                 }
         
- foreach ($obj in $drivearray){
-    
-    $body = @{
-        data = @{
-            type       = "flexible-assets"
-            attributes = @{
-                "organization_id"           = $ITGlueOrganisation
-                "flexible_asset_type_id"    = $assettypeID
-                traits                      = @{
-                    "drive-letter"          = $obj.DriveLetter
-                    "drive-label"           = $obj.DriveLabel
-                    "drive-path"            = $obj.DrivePath
-                    "item-level-targetting" = $obj.DriveFilterGroup
-
-                }
-            }
-        }
- }
-    
-    $tenantAsset = $body | ConvertTo-Json -Depth 10
-
-
-CreateITGItem -resource flexible_assets -body $tenantAsset
-Write-Host "Created Mapped Drive Object for $($obj.DriveLabel)"
-}
+ 
 
