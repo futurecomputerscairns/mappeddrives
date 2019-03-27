@@ -39,12 +39,12 @@ function UpdateITGItem ($resource, $existingItem, $newBody) {
 
 function CreateMappedDriveAsset ($tenantInfo) {
 
-$body = @{
+    $body = @{
         data = @{
             type       = "flexible-assets"
             attributes = @{
-                "organization_id"           = $ITGlueOrganisation
-                "flexible_asset_type_id"    = $assettypeID
+                "organization-id"        = $ITGlueOrganisation
+                "flexible-asset-type-id" = $assettypeID
                 traits                      = @{
                     "drive-letter"          = $obj.DriveLetter
                     "drive-label"           = $obj.DriveLabel
@@ -58,7 +58,7 @@ $body = @{
 
 
  $tenantAsset = $body | ConvertTo-Json -Depth 10
- 
+ return $tenantAsset
 }
 
 
