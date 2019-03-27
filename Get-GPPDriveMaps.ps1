@@ -124,7 +124,8 @@ throw "Module GroupPolicy not Installed"
                                     $object | Add-Member -MemberType NoteProperty -Name DriveFilterGroup -Value $DriveFilterGroup
                                     $drivearray += $Object
 
-                                    foreach ($obj in $drivearray){
+                                    }
+                                     foreach ($obj in $drivearray){
  
                                     $existingAssets = @()
                                     $existingAssets += GetAllITGItems -Resource "flexible_assets?filter[organization_id]=$ITGlueOrganisation&filter[flexible_asset_type_id]=$assetTypeID"
@@ -143,9 +144,6 @@ throw "Module GroupPolicy not Installed"
                                                 Start-Sleep -Seconds 3
         
                                             }
-
-
-                                        }
 
 
 
