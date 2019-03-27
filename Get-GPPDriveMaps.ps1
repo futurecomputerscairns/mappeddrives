@@ -46,10 +46,10 @@ function CreateMappedDriveAsset ($tenantInfo) {
                 "organization-id"        = $ITGlueOrganisation
                 "flexible-asset-type-id" = $assettypeID
                 traits                      = @{
-                    "drive-letter"          = $obj.DriveLetter
-                    "drive-label"           = $obj.DriveLabel
-                    "drive-path"            = $obj.DrivePath
-                    "item-level-targetting" = $obj.DriveFilterGroup
+                    "drive-letter"          = $tenantInfo.DriveLetter
+                    "drive-label"           = $tenantInfo.DriveLabel
+                    "drive-path"            = $tenantInfo.DrivePath
+                    "item-level-targetting" = $tenantInfo.DriveFilterGroup
 
                 }
             }
