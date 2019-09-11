@@ -129,7 +129,7 @@ throw "Module GroupPolicy not Installed"
  
                                     $existingAssets = @()
                                     $existingAssets += GetAllITGItems -Resource "flexible_assets?filter[organization_id]=$ITGlueOrganisation&filter[flexible_asset_type_id]=$assetTypeID"
-                                    $matchingAsset = $existingAssets | Where-Object {$_.attributes.traits.'drive-path' -contains $obj.DrivePath}
+                                    $matchingAsset = $existingAssets | Where-Object {$_.attributes.traits.'drive-letter' -contains $obj.DriveLetter}
 
                                         if ($matchingAsset) {
                                             Write-Output "Updating Mapped Drive Flexible Asset for $obj.DriveLabel"
